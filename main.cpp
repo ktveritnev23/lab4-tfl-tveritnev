@@ -706,7 +706,7 @@ public:
     }
 };
 
-
+// 8 баллов: Парсер + контекстно-свободная грамматика
 int main()
 {
     vector<string> potential_patterns = {"(aa|bb)(?1)",
