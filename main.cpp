@@ -600,15 +600,14 @@ public:
             case 2:
                 nonterm_name = "C" + to_string(enumerators[2]++);
                 very_big_rule += nonterm_name;
+                rules.emplace_back(nonterm_name, lex->lookaheads[tok.pos].substr);
                 for (const string &alt : lex->lookaheads[tok.pos].alternatives)
                 {
                     if (alt.size() >= 4 && alt[1] == lex->question_mark)
                     {
-                        group_to_be_referenced = alt[2] - '0' - 1;
-                        if (cg_nonterms.size() <= group_to_be_referenced)
-                            cout << "The capturing group has not been initialized yet!";
-                        else
-                            rules.emplace_back(nonterm_name, cg_nonterms[group_to_be_referenced]);
+                        string term_to_be_referenced = alt.substr(3);
+                        cout << alt;
+                        rules.emplace_back(nonterm_name, term_to_be_referenced);
                     }
                     else
                         rules.emplace_back(nonterm_name, alt);
@@ -692,7 +691,9 @@ int main()
                                          "(a|(bb))(a|(?3))",
                                          "(a(?1)b|c)",
                                          "(aa|bb)cc(?:dd|ee)",
-                                         "(aa|bb*)*cc|dd(?:ee*|ff*)"};
+                                         "(aa|bb*)*cc|dd(?:ee*|ff*)",
+                                         "aa(?=bb)"
+    };
     string regex_string;
 
     for (int i = 0; i < potential_patterns.size(); i++)
