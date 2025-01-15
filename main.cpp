@@ -336,11 +336,6 @@ public:
             // cg.value.output_alts();
         }
         cout << "Printing independent subregexes: " << endl;
-        for (const regex_element &re : independent_elements)
-        {
-            re.output_unlexed();
-            // re.output_alts();
-        }
     }
 
     void print_lexed_regex()
@@ -450,9 +445,8 @@ public:
         lex->lex_alternator();
         //lex->print_lexed_regex();
         lex->print_unbloated();
-        cout << endl
-             << "_________________________" << endl;
-        // 
+        //cout << endl
+        //     << "_________________________" << endl; 
     }
 
     void construct_parser()
@@ -500,7 +494,7 @@ public:
                     lex->lookaheads[i].substr, to.type, to.coord});
                 break;
             case 3:
-                cout << to.coord << endl;
+                //cout << to.coord << endl;
                 tokens.push_back(token{
                     to_string(/*lex->refs[i].w*/lex->refs[to.coord].w-1), to.type, to.coord});
                 break;
@@ -508,15 +502,14 @@ public:
                 cout << "Что-то пошло не так..." << endl;
             }
 
-            // cout << (to.type ? lex->independent_elements[to.coord].substr : lex->captured_groups[to.coord].group_regex) << endl;
-            // tokens.push_back(token{
-            //    (to.type ? lex->independent_elements[to.coord].substr : lex->captured_groups[to.coord].group_regex), to.type});
+ 
         }
     }
 
     void tokens_to_production_rules()
     {
-        string big_ass_rule;
+        
+        string very_big_rule;
         int enumerators[4] = {0, 0, 0, 0};
         string nonterm_name;
         vector<string> cg_nonterms;
@@ -529,21 +522,8 @@ public:
             {
             case 0:
                 nonterm_name = "A" + to_string(enumerators[0]++);
-                big_ass_rule += nonterm_name;
-                /* for (const string &alt : lex->captured_groups[tok.pos].value.alternatives)
-                {
-                     if(alt.size() >= 4 && alt[1] == lex->question_mark){
-                        group_to_be_referenced = alt[2]-'0'-1;
-                        if(cg_nonterms.size() <= group_to_be_referenced)
-                            cout << "The capturing group has not been initialized yet!";
-                        else rules.emplace_back(nonterm_name, cg_nonterms[group_to_be_referenced]);
-                    }
-                    else
-                    rules.emplace_back(nonterm_name, alt);
-
-                    //rules.emplace_back(nonterm_name, alt);
-                    // rules.emplace_back(lex->captured_groups[tok.pos].group_regex, alt);
-                } */
+                very_big_rule += nonterm_name;
+     
                 for (int i = 0; i < lex->captured_groups[tok.pos].value.alternatives.size(); i++)
                 {
                     const string &alt = lex->captured_groups[tok.pos].value.alternatives[i];
@@ -583,7 +563,7 @@ public:
             case 1:
 
                 nonterm_name = "B" + to_string(enumerators[1]++);
-                big_ass_rule += nonterm_name;
+                very_big_rule += nonterm_name;
 
                 for (int i = 0; i < lex->independent_elements[tok.pos].alternatives.size(); i++)
                 {
@@ -619,8 +599,7 @@ public:
                 break;
             case 2:
                 nonterm_name = "C" + to_string(enumerators[2]++);
-                big_ass_rule += nonterm_name;
-                // лютый спагетти-код, зато хоть как-то работает
+                very_big_rule += nonterm_name;
                 for (const string &alt : lex->lookaheads[tok.pos].alternatives)
                 {
                     if (alt.size() >= 4 && alt[1] == lex->question_mark)
@@ -637,10 +616,8 @@ public:
                 // rules.emplace_back(lex->lookaheads[tok.pos].substr, alt);
                 break;
             case 3:
-                // to do: if reference is recursive,  do not add new name
-                // do kickback
+
                 nonterm_name = "D" + to_string(enumerators[3]++);
-                //cout << "ZZZ";
                 // references, the 「easiest」
                 temp_pos = stoi(tok.content);
                 
@@ -672,7 +649,7 @@ public:
                 else {
                     for (const string &alt : lex->captured_groups[temp_pos].value.alternatives)
                         rules.emplace_back(nonterm_name, alt);
-                    big_ass_rule += nonterm_name;
+                    very_big_rule += nonterm_name;
                 }
 
                 break;
@@ -680,7 +657,7 @@ public:
                 cout << "Что-то пошло не так..." << endl;
             }
         }
-        rules.insert(rules.begin(), production_rule{"S", big_ass_rule});
+        rules.insert(rules.begin(), production_rule{"S", very_big_rule});
     }
 
 
@@ -706,6 +683,8 @@ public:
     }
 };
 
+
+// Вариант 8
 // 8 баллов: Парсер + контекстно-свободная грамматика
 int main()
 {
