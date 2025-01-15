@@ -98,6 +98,7 @@ public:
              { return left.first < right.first; });
         for (const auto &r : matchingPairs)
         {
+            cout << full_regex.substr(r.first, r.second-r.first+1) << endl;
             // this should replace th
             if (r.second - r.first + 1 > 3 && full_regex.substr(r.first + 1, 2) == non_capture)
                 independent_elements.push_back(
@@ -191,7 +192,6 @@ public:
     bool check_groups()
     {
         // basic sanity check
-
         for (group_reference &gr : refs)
         {
             //cout << gr.w;
@@ -651,7 +651,7 @@ public:
                 //   lex->captured_groups[temp_pos].group_regex.size() <<"}" << endl;
                 if(ref_pos-1 < lex->captured_groups.size() && 
                    lex->refs[ref_pos-1].pos >= lex->captured_groups[temp_pos].value.begin_position &&
-                   lex->refs[ref_pos-1].pos <= lex->captured_groups[temp_pos].value.begin_position +
+                   lex->refs[ref_pos-1].pos < lex->captured_groups[temp_pos].value.begin_position +
                    lex->captured_groups[temp_pos].group_regex.size()){
                         string to_find = "(?"+to_string(temp_pos+1)+")";
                         //cout << to_find;
