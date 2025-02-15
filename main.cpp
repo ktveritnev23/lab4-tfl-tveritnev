@@ -449,6 +449,33 @@ public:
         //     << "_________________________" << endl; 
     }
 
+    void tokenize(const vector<token_order>& tos) {
+        enum token_types {captured, independent, lookahead, reference};
+        for(const token_order& to : tos) {
+            switch (to.type)
+            {
+            case token_types::captured:
+                tokens.push_back(token{
+                    lex->captured_groups[to.coord].group_regex, to.type, to.coord});
+                break;
+            case token_types::independent:
+                tokens.push_back(token{
+                    lex->independent_elements[to.coord].substr, to.type, to.coord});
+                break;
+            case token_types::lookahead:
+                tokens.push_back(token{
+                    lex->lookaheads[to.coord].substr, to.type, to.coord});
+                break;
+            case token_types::reference:
+                tokens.push_back(token{
+                    to_string(lex->refs[to.coord].w-1), to.type, to.coord});
+                break;
+            default:
+                cout << "Unknown token type!!!" << endl;
+            }
+        }
+    }
+
     void construct_parser()
     {
         // total number of nonterms
@@ -476,34 +503,7 @@ public:
         }
         sort(tos.begin(), tos.end());
 
-        for (const token_order &to : tos)
-        {
-            // VERY boilerplate type of code, but I can't do anything about it (at least for now)
-            switch (to.type)
-            {
-            case 0:
-                tokens.push_back(token{
-                    lex->captured_groups[to.coord].group_regex, to.type, to.coord});
-                break;
-            case 1:
-                tokens.push_back(token{
-                    lex->independent_elements[to.coord].substr, to.type, to.coord});
-                break;
-            case 2:
-                tokens.push_back(token{
-                    lex->lookaheads[i].substr, to.type, to.coord});
-                break;
-            case 3:
-                //cout << to.coord << endl;
-                tokens.push_back(token{
-                    to_string(/*lex->refs[i].w*/lex->refs[to.coord].w-1), to.type, to.coord});
-                break;
-            default:
-                cout << "Что-то пошло не так..." << endl;
-            }
-
- 
-        }
+        tokenize(tos);
     }
 
     void tokens_to_production_rules()
